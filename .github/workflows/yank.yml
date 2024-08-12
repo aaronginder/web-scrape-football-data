@@ -1,0 +1,100 @@
+name: Yank Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Tag to yank'
+        required: true
+        type: string
+
+permissions:
+  contents: write # to be able to delete a GitHub release and tags
+
+jobs:
+  yank-release:
+    name: Yank Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4.1.7
+
+      - name: Install GitHub CLI
+        run: |
+          sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-key 23F3D4EA75716059
+          echo "deb https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+          sudo apt-get update
+          sudo apt-get install gh -y
+
+      - name: List all releases
+        run: gh release list
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check if release exists
+        id: check_release
+        run: |
+          TAG_NAME=${{ github.event.inputs.tag }}
+          echo "Checking for release associated with tag: $TAG_NAME"
+          RELEASE_ID=$(gh release view $TAG_NAME --json id --jq '.id' 2>/dev/null || echo "release_not_found")
+          echo "Release ID: $RELEASE_ID"
+          echo "RELEASE_ID=$RELEASE_ID" >> $GITHUB_ENV
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: View Release Details
+        if: env.RELEASE_ID != 'release_not_found'
+        run: |
+          TAG_NAME=${{ github.event.inputs.tag }}
+          echo "Viewing release details for tag: $TAG_NAME"
+          gh release view $TAG_NAME --json id,tagName --jq '.id, .tagName'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Yank GitHub release
+        if: env.RELEASE_ID != 'release_not_found'
+        id: yank_release
+        run: |
+          TAG_NAME=${{ github.event.inputs.tag }}
+          echo "Yanking release ID: $RELEASE_ID ($TAG_NAME)"
+          gh release delete $TAG_NAME --yes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Delete GitHub tag
+        if: env.RELEASE_ID != 'release_not_found'
+        run: |
+          TAG_NAME=${{ github.event.inputs.tag }}
+          echo "Deleting tag: $TAG_NAME"
+          git push --delete origin $TAG_NAME
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Remove release in CHANGELOG.md
+        if: env.RELEASE_ID != 'release_not_found'
+        run: |
+          TAG_NAME=${{ github.event.inputs.tag }}
+          echo "Removing release $TAG_NAME in CHANGELOG.md"
+          TAG_NAME_WITHOUT_SUFFIX=$(echo $TAG_NAME | sed 's/^v//')
+          sed '/## \['"$TAG_NAME_WO_SUFFIX"'\]/,/^## \[[0-9]\+\.[0-9]\+\.[0-9]\+\]/ { /^## \['"$TAG_NAME_WO_SUFFIX"'\]/! { /^## \[[0-9]\+\.[0-9]\+\.[0-9]\+\]/!d; }; /^## \['"$TAG_NAME_WO_SUFFIX"'\]/d; }' CHANGELOG.md
+        # git config --global user.name 'github-actions[bot]'
+        # git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+        # git add CHANGELOG.md
+        # git commit -m "Removed release $TAG_NAME in CHANGELOG.md"
+        # git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # - name: Prevent recreation of yanked release
+      #   if: env.RELEASE_ID != 'release_not_found'
+      #   run: |
+      #     TAG_NAME=${{ github.event.inputs.tag }}
+      #     echo "Recording yanked release $TAG_NAME"
+      #     echo "yanked $TAG_NAME" >> .yanked-releases
+      #     git config --global user.name 'github-actions[bot]'
+      #     git config --global user.email 'github-actions[bot]@users.noreply.github.com'
+      #     git add .yanked-releases
+      #     git commit -m "Record yanked release $TAG_NAME"
+      #     git push
+      #   env:
+      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
