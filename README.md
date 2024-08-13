@@ -10,11 +10,14 @@
 4. [Data Sources](#data-sources)
 5. [Contributions](#contributions)
 6. [License](#license)
-7. [Contact](#contact)
+7. [Future Enhancements](#future-enhancements)
+8. [Contact](#contact)
 
 ## Introduction
 
 Generates a CSV of all games in the Premier League reported on `https://www.football-data.co.uk` via web scraping in Python. Repo contains an orchestrated pipeline to generate and process data from the website.
+
+An example dashboard visualising this data can be found [here](https://public.tableau.com/app/profile/aaron2218/viz/EnglishPremierLeague_15745521956850/EnglishPremierLeaguePerformanceOverview).
 
 ## Insallation
 
@@ -56,6 +59,13 @@ We welcome contributions to this project. Please follow these steps:
 ## License
 
 This project is licensed under the GNU General Public License. See the [LICENSE](LICENSE) file for details.
+
+## Future Enhancements
+
+- Support more football leagues
+- Retrieve player information including career statistics
+- Implement tests into GitHub actions
+- Implement Python code lint into GitHub action
 
 ## Contact
 
