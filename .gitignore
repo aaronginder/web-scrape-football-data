@@ -73,7 +73,9 @@ docs/_build/
 
 # PyBuilder
 .pybuilder/
-src/target/**
+src/target/*
+!src/target/.gitkeep
+
 
 # Jupyter Notebook
 .ipynb_checkpoints
