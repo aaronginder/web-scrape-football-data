@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/aaronginder/web-scrape-football-data/compare/v1.0.0...v1.0.1) (2024-08-13)
+
+
+### Bug Fixes
+
+* create target folder and update config output folder ([783397c](https://github.com/aaronginder/web-scrape-football-data/commit/783397c52558224e544b24394341a6223de3b493))
+
 # 1.0.0 (2024-08-13)
 
 
