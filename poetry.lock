@@ -187,13 +187,13 @@ files = [
 
 [[package]]
 name = "luigi"
-version = "3.5.1"
+version = "3.6.0"
 description = "Workflow mgmgt + task scheduling + dependency resolution."
 optional = false
 python-versions = "*"
 groups = ["main"]
 files = [
-    {file = "luigi-3.5.1.tar.gz", hash = "sha256:fc790b2747515dd19c673efbb8e4c9ace5f4c5cdc31f8e7f93dc667deb2ec6c8"},
+    {file = "luigi-3.6.0.tar.gz", hash = "sha256:41b14850223c619d9006b30acda733e756b883fc7e60814205576647190c96e3"},
 ]
 
 [package.dependencies]
@@ -668,4 +668,4 @@ zstd = ["backports-zstd (>=1.0.0) ; python_version < \"3.14\""]
 [metadata]
 lock-version = "2.1"
 python-versions = "^3.12"
-content-hash = "a8dc687a8143a29fd36bfb9533f112899bb59c8fd77547e48fc203af7a1a20ec"
+content-hash = "9d9ce4bdef93689150fdac0aead43df6fb652c85fc157ebe4b21c0855f1caf40"
